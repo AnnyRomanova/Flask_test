@@ -20,35 +20,34 @@ app = Flask(__name__)
 
 @app.route('/cars', methods=['GET'])
 def get_cars():
-    logger.info("Запрос записей из базы данных")
+    logger.info("Принят запрос на список автомобилей от клиента из базы данных")
     cars = select_data()
     record_count = len(cars)
 
     if record_count == 0:
         logger.info("Запрос выполнен успешно: база данных пуста.")
     else:
-        logger.info("Запрос выполнен успешно: получено %d записей из базы данных.", record_count)
+        logger.info("Запрос выполнен успешно: клиенту направлено %d записей из базы данных.", record_count)
 
     return jsonify(cars)
 
 
 @app.route('/cars', methods=['POST'])
 def post_cars():
-    last_id = len(select_data())
-    new_id = last_id + 1
+    logger.info("Принят запрос от клиента на добавление новой машины в базу данных")
     data = request.get_json()
     new_car = {
-        "id": new_id,
         "model": data["model"],
         "color": data["color"]
     }
     add_user_data(new_car)
-    logger.info("Новая запись успешно добавлена в базу данных")
-    return jsonify({"id записи": new_id}), 201
+    logger.info("Запрос на добавление новой машины в базу данных выполнен успешно")
+    return "Запись добавлена", 201
 
 
 @app.route('/cars/<int:car_id>/color', methods=['PUT'])
 def update_car(car_id):
+    logger.info("Принят запрос от клиента на изменение цвета машины с id = %d", car_id)
     cars = select_data()
     # проверяем, есть ли запись в БД
     flag = False
@@ -56,7 +55,7 @@ def update_car(car_id):
         if car_id in car:
             flag = True
     if flag is False:
-        logger.error("Запись с id = %d в базе данных не найдена", car_id)
+        logger.error("Машина с id = %d в базе данных не найдена", car_id)
         return jsonify({"error": "Машина не найдена"}), 404
 
     # Получаем JSON данные из запроса
@@ -72,6 +71,7 @@ def update_car(car_id):
 
 @app.route('/cars/<int:car_id>', methods=['DELETE'])
 def delete_car(car_id):
+    logger.info("Принят запрос от клиента на удаление машины с id = %d", car_id)
     cars = select_data()
     # проверяем, есть ли запись в БД
     flag = False
@@ -79,13 +79,13 @@ def delete_car(car_id):
         if car_id in car:
             flag = True
     if flag is False:
-        logger.error("Запись с id = %d в базе данных не найдена", car_id)
+        logger.error("Машина с id = %d в базе данных не найдена", car_id)
         return jsonify({"error": "Машина не найдена"}), 404
 
     # Удаляем запись из бд
     del_car(car_id)
     record_count = len(select_data())
-    logger.info("Машина удалена из базы данных. В базе данных осталось %d машин", record_count)
+    logger.info("Машина с id = %d удалена из базы данных. В базе данных осталось %d машин", car_id, record_count)
 
     return "", 204
 

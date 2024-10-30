@@ -13,22 +13,24 @@ logger.info("Подключение к базе данных")
 
 
 def create_db():
+    logger.info("Запрос на создание базы данных")
     cursor.execute("""CREATE TABLE cars (
-        id int,
-        model text,
-        color text
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        model TEXT,
+        color TEXT
         )""")
     logger.info("База данных с пустыми полями создана")
 
 
 # Добавляем данные в таблицу
 def fill_the_table():
+    logger.info("Запрос на заполнение базы данных")
     query_list = [
-        (1, 'volkswagen', 'синий'),
-        (2, 'Lamborghini', 'красный'),
-        (3, 'Toyota', 'серебристый')
+        ('volkswagen', 'синий'),
+        ('Lamborghini', 'красный'),
+        ('Toyota', 'серебристый')
      ]
-    query = """ INSERT INTO cars (id, model, color) VALUES(?,?,?); """
+    query = """ INSERT INTO cars (model, color) VALUES(?,?); """
 
     cursor.executemany(query, query_list)
 
